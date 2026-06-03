@@ -1,0 +1,44 @@
+package jobs
+
+/*
+	Leonidas C2 Framework
+	Copyright (C) 2026  Leonidas C2 Project
+
+	This program is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+import (
+	"context"
+
+	"github.com/leonidas-c2/leonidas/client/console"
+	"github.com/leonidas-c2/leonidas/protobuf/clientpb"
+	"github.com/spf13/cobra"
+)
+
+// ICMPListenerCmd - Start an ICMP C2 listener.
+// Requires CAP_NET_RAW (root / administrator) on the server host.
+func ICMPListenerCmd(cmd *cobra.Command, con *console.SliverClient, args []string) {
+	lhost, _ := cmd.Flags().GetString("lhost")
+
+	con.PrintInfof("Starting ICMP listener on %s ...\n", lhost)
+	resp, err := con.Rpc.StartICMPListener(context.Background(), &clientpb.ICMPListenerReq{
+		Host: lhost,
+	})
+	con.Println()
+	if err != nil {
+		con.PrintErrorf("%s\n", err)
+		return
+	}
+	con.PrintInfof("Successfully started ICMP listener job #%d\n", resp.JobID)
+}
